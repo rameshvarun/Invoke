@@ -1,0 +1,6 @@
+Temp/*
+Library/*
+Build/*
+
+*.pidb
+*.userprefs
