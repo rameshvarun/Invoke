@@ -75,13 +75,24 @@ public class GridLoader : MonoBehaviour {
 			}
 		}
 
+		Vector3 center = new Vector3((mapWidth/2)*tileSize,0,(mapHeight/2)*tileSize);
+
+		//Instantiate base water
+		Object waterObject = Instantiate(tiles[0], center + new Vector3(0,-0.1f,0), Quaternion.identity);
+		((Transform)waterObject).localScale = Vector3.one * mapWidth * 2;
+
 		//Instantiate tiles from prefabs list
 		for(int x = 0; x < map.GetLength(0); ++x) {
 			for(int y = 0; y < map.GetLength(1); ++y) {
 				int type = map[x,y];
-				Instantiate(tiles[type], new Vector3(x*tileSize,0,y*tileSize), Quaternion.identity);
+				if(type > 0) {
+					Instantiate(tiles[type], new Vector3(x*tileSize,0,y*tileSize), Quaternion.identity);
+				}
 			}
 		}
+
+		//Center camera
+		GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraControl>().targetPos = center;
 	}
 	
 	// Update is called once per frame
