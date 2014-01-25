@@ -9,6 +9,8 @@ public class BuildingScript : MonoBehaviour {
 	public int x;
 	public int y;
 
+	public string buildingType;
+
 	// Use this for initialization
 	void Start () {
 		gridLoader = GameObject.FindGameObjectWithTag("GameController").GetComponent<GridLoader>();

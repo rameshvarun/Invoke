@@ -9,16 +9,23 @@ public class AIBuilder : MonoBehaviour {
 
 	enum Action {
 		Wall,
-		Huts
+		Hut,
+		WaterTower,
+		ConstructionStation,
+		EngineeringStation,
+		Clinic,
+		Granary
 	}
 
+	private Dictionary<Action, int> defaultAffinities;
 	private Dictionary<Action, int> affinities;
 
 	private GridLoader gridLoader;
 
 	public Transform[] huts;
 
-	GameObject getBuildingAt(int x, int y) {
+	public GameObject getBuildingAt(int x, int y) {
+
 		GameObject[] buildings = GameObject.FindGameObjectsWithTag("Building");
 
 		for(int i = 0; i < buildings.Length; ++i) {
@@ -30,6 +37,19 @@ public class AIBuilder : MonoBehaviour {
 		return null;
 	}
 
+	public ArrayList getBuildingsByType(string buildingType) {
+		ArrayList buildingsList = new ArrayList();
+
+		GameObject[] buildings = GameObject.FindGameObjectsWithTag("Building");
+		for(int i = 0; i < buildings.Length; ++i) {
+			if(buildings[i].GetComponent<BuildingScript>().buildingType == buildingType) {
+				buildingsList.Add(buildings[i]);
+			}
+		}
+
+		return buildingsList;
+	}
+
 	// Use this for initialization
 	void Start () {
 		//Get refence to grid loading script
@@ -37,10 +57,16 @@ public class AIBuilder : MonoBehaviour {
 
 		currentTime = 0;
 
-		//Set up initial affinities
+		//Set up default affinities
+		defaultAffinities = new Dictionary<Action, int>();
+		defaultAffinities[Action.Wall] = 0;
+		defaultAffinities[Action.Hut] = 2;
+
+		//Copy into store for current affinities
 		affinities = new Dictionary<Action, int>();
-		affinities[Action.Wall] = 0;
-		affinities[Action.Huts] = 1;
+		foreach(KeyValuePair<Action,int> pair in defaultAffinities ) {
+			affinities[pair.Key] = pair.Value;
+		}
 
 		//Instantiate first village
 		Instantiate(huts[Random.Range(0, huts.Length)], new Vector3((gridLoader.mapWidth/2)*gridLoader.tileSize,0,(gridLoader.mapHeight/2)*gridLoader.tileSize), Quaternion.identity);
@@ -63,7 +89,7 @@ public class AIBuilder : MonoBehaviour {
 			}
 		}
 
-		if(action == Action.Huts) {
+		if(action == Action.Hut) {
 			GameObject[] buildings = GameObject.FindGameObjectsWithTag("Building");
 			while(true) {
 				BuildingScript randomBuilding = buildings[Random.Range(0, buildings.Length)].GetComponent<BuildingScript>();

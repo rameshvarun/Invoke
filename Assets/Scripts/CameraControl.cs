@@ -29,6 +29,10 @@ public class CameraControl : MonoBehaviour {
 
 	public Transform meteorSelect;
 
+	public float shakeTime;
+
+	public Transform rainSystem;
+
 	// Use this for initialization
 	void Start () {
 		gridLoader = GameObject.FindGameObjectWithTag("GameController").GetComponent<GridLoader>();
@@ -42,6 +46,8 @@ public class CameraControl : MonoBehaviour {
 
 		mode = "panning";
 		meteorSelect.renderer.enabled = false;
+
+		shakeTime = 0.0f;
 	}
 	
 	// Update is called once per frame
@@ -66,8 +72,15 @@ public class CameraControl : MonoBehaviour {
 
 		cameraComponent.orthographicSize = Mathf.Lerp(cameraComponent.orthographicSize, targetScroll, scrollSpeed*Time.deltaTime);
 
-		transform.position = targetPos + displacement;
-		transform.LookAt(targetPos);
+		if(shakeTime > 0) {
+			shakeTime -= Time.deltaTime;
+			transform.position = targetPos + displacement + Random.onUnitSphere*shakeTime*0.1f;
+			transform.LookAt(targetPos + Random.onUnitSphere*shakeTime*0.1f );
+		}
+		else {
+			transform.position = targetPos + displacement;
+			transform.LookAt(targetPos);
+		}
 
 		Vector2 move = new Vector3();
 
@@ -112,5 +125,8 @@ public class CameraControl : MonoBehaviour {
 		else {
 			meteorSelect.renderer.enabled = false;
 		}
+
+		//Move Rain System
+		rainSystem.transform.position = transform.position + new Vector3(0,10,0);
 	}
 }
