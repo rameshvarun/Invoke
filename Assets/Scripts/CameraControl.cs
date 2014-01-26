@@ -33,9 +33,14 @@ public class CameraControl : MonoBehaviour {
 
 	public Transform rainSystem;
 
+	public float rainTime;
+
+	private GUIScript guiScript;
+
 	// Use this for initialization
 	void Start () {
 		gridLoader = GameObject.FindGameObjectWithTag("GameController").GetComponent<GridLoader>();
+		guiScript = GameObject.FindGameObjectWithTag("GameController").GetComponent<GUIScript>();
 		cameraComponent = this.GetComponent<Camera>();
 
 		//This determines how the mouse direction is mapped to movements in the 3d space
@@ -118,7 +123,7 @@ public class CameraControl : MonoBehaviour {
 			if(Input.GetMouseButtonUp(1))
 				mode = "panning";
 
-			if(Input.GetMouseButtonUp(0) && !GUIScript.mouseInUI() ) {
+			if(Input.GetMouseButtonUp(0) && !guiScript.mouseInUI() ) {
 				mode = "panning";
 			}
 		}
@@ -128,5 +133,12 @@ public class CameraControl : MonoBehaviour {
 
 		//Move Rain System
 		rainSystem.transform.position = transform.position + new Vector3(0,10,0);
+		if(rainTime > 0.0f) {
+			rainTime -= Time.deltaTime;
+			rainSystem.particleSystem.Play();
+		}
+		else {
+			rainSystem.particleSystem.Stop();
+		}
 	}
 }

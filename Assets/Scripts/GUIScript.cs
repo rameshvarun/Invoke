@@ -2,26 +2,48 @@
 using System.Collections;
 
 public class GUIScript : MonoBehaviour {
+	
+	public Transform meteorFrame;
+	public Transform rainFrame;
+	public Transform quakeFrame;
 
-	public Texture2D meteorIcon;
-	public Texture2D earthquakeIcon;
+	private GUITexture meteorTexture;
+	private GUITexture rainTexture;
+	private GUITexture quakeTexture;
 
-	private static Rect meteorRect;
-	private static Rect earthquakeRect;
+	private CameraControl cameraControl;
 
-	public static bool mouseInUI() {
-		return meteorRect.Contains(new Vector2(Input.mousePosition.x, Screen.height - Input.mousePosition.y));
+	void Start() {
+		meteorTexture = meteorFrame.guiTexture;
+		rainTexture = rainFrame.guiTexture;
+		quakeTexture = quakeFrame.guiTexture;
+
+		cameraControl = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraControl>();
 	}
 
-	void OnGUI () {
-		meteorRect = new Rect(Screen.width/2 - 50,Screen.height - 120,100,100);
-		earthquakeRect = new Rect(Screen.width/2 - 50 - 120,Screen.height - 120,100,100);
+	float GUIx( int x ) {
+		return ((float)(x))/Screen.width;
+	}
 
-		if( GUI.Button (meteorRect , meteorIcon ) ) {
-			GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraControl>().mode = "meteor";
+	float GUIy( int y ) {
+		return ((float)(y))/Screen.height;
+	}
+
+
+	public bool mouseInUI() {
+		return meteorTexture.GetScreenRect().Contains(Input.mousePosition);
+	}
+
+	void Update () {
+		meteorTexture.transform.position = new Vector3(GUIx(Screen.width/2 - 100),GUIy( 20 ),1);
+		rainTexture.transform.position = new Vector3(GUIx(Screen.width/2 - 100 - 200 - 20),GUIy( 20 ),1);
+
+		if( Input.GetMouseButtonUp(0) && meteorTexture.GetScreenRect().Contains(Input.mousePosition) ) {
+			cameraControl.mode = "meteor";
 		}
-		if( GUI.Button (earthquakeRect , earthquakeIcon ) ) {
-			GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraControl>().shakeTime = 3.0f;
+
+		if( Input.GetMouseButtonUp(0) && rainTexture.GetScreenRect().Contains(Input.mousePosition) ) {
+			cameraControl.rainTime = 5.0f;
 		}
 	}
 }

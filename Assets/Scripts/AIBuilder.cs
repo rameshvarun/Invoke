@@ -61,6 +61,11 @@ public class AIBuilder : MonoBehaviour {
 		defaultAffinities = new Dictionary<Action, int>();
 		defaultAffinities[Action.Wall] = 0;
 		defaultAffinities[Action.Hut] = 2;
+		defaultAffinities[Action.WaterTower] = 0;
+		defaultAffinities[Action.ConstructionStation] = 0;
+		defaultAffinities[Action.EngineeringStation] = 0;
+		defaultAffinities[Action.Clinic] = 0;
+		defaultAffinities[Action.Granary] = 0;
 
 		//Copy into store for current affinities
 		affinities = new Dictionary<Action, int>();
