@@ -6,19 +6,23 @@ public class GUIScript : MonoBehaviour {
 	public Transform meteorFrame;
 	public Transform rainFrame;
 	public Transform quakeFrame;
+	public Transform diseaseFrame;
+	public Transform fireFrame;
 
-	private GUITexture meteorTexture;
-	private GUITexture rainTexture;
-	private GUITexture quakeTexture;
+	public Transform populationText;
+	public Transform foodText;
+	public Transform manaText;
+	public Transform happinessText;
 
-	private CameraControl cameraControl;
+
+	private SimulationScript simulationScript;
+
+	public GUISkin guiSkin;
 
 	void Start() {
-		meteorTexture = meteorFrame.guiTexture;
-		rainTexture = rainFrame.guiTexture;
-		quakeTexture = quakeFrame.guiTexture;
 
-		cameraControl = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraControl>();
+		simulationScript = GetComponent<SimulationScript>();
+	
 	}
 
 	float GUIx( int x ) {
@@ -31,19 +35,37 @@ public class GUIScript : MonoBehaviour {
 
 
 	public bool mouseInUI() {
-		return meteorTexture.GetScreenRect().Contains(Input.mousePosition);
+		GameObject[] guiObjects = GameObject.FindGameObjectsWithTag("GUI");
+		for(int i = 0; i < guiObjects.Length; ++i) {
+			if(guiObjects[i].GetComponent<ActionScript>().getRect().Contains(Input.mousePosition))
+				return true;
+		}
+		return false;
 	}
 
 	void Update () {
-		meteorTexture.transform.position = new Vector3(GUIx(Screen.width/2 - 100),GUIy( 20 ),1);
-		rainTexture.transform.position = new Vector3(GUIx(Screen.width/2 - 100 - 200 - 20),GUIy( 20 ),1);
+		meteorFrame.guiTexture.transform.position = new Vector3(GUIx(Screen.width/2 - 100),GUIy( 20 ),1);
+		rainFrame.guiTexture.transform.position = new Vector3(GUIx(Screen.width/2 - 100 - 200 - 20),GUIy( 20 ),1);
+		quakeFrame.guiTexture.transform.position = new Vector3(GUIx(Screen.width/2 - 100 + 200 + 20),GUIy( 20 ),1);
+		diseaseFrame.guiTexture.transform.position = new Vector3(GUIx(Screen.width/2 - 100 + 400 + 40),GUIy( 20 ),1);
+		fireFrame.guiTexture.transform.position = new Vector3(GUIx(Screen.width/2 - 100 - 400 - 40),GUIy( 20 ),1);
 
-		if( Input.GetMouseButtonUp(0) && meteorTexture.GetScreenRect().Contains(Input.mousePosition) ) {
-			cameraControl.mode = "meteor";
-		}
+		//Update GUI Text
+		populationText.guiText.text = "Population: " + (int)simulationScript.population;
+		foodText.guiText.text = "Food: " + (int)simulationScript.food;
+		manaText.guiText.text = "Mana: " + (int)simulationScript.mana;
+		happinessText.guiText.text = "Happiness: " + (int)simulationScript.happiness;
+	}
 
-		if( Input.GetMouseButtonUp(0) && rainTexture.GetScreenRect().Contains(Input.mousePosition) ) {
-			cameraControl.rainTime = 5.0f;
+	void OnGUI() {
+
+		GUI.skin = guiSkin;
+
+		GameObject[] guiObjects = GameObject.FindGameObjectsWithTag("GUI");
+		for(int i = 0; i < guiObjects.Length; ++i) {
+			if(guiObjects[i].GetComponent<ActionScript>().getRect().Contains(Input.mousePosition)) {
+				GUI.Box(new Rect (Input.mousePosition.x,Screen.height - Input.mousePosition.y,200,100), guiObjects[i].GetComponent<ActionScript>().tooltip);
+			}
 		}
 	}
 }

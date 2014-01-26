@@ -14,6 +14,8 @@ public class GridLoader : MonoBehaviour {
 	public int evolutionPasses;
 	public int waterMargin;
 
+	public Transform[] trees;
+
 	int[,] MapCopy(int[,] array) {
 		int[,] newArray = new int[array.GetLength(0),array.GetLength(1)];
 
@@ -56,7 +58,7 @@ public class GridLoader : MonoBehaviour {
 			for(int x = waterMargin; x < mapWidth - waterMargin; ++x) {
 				for(int y = waterMargin; y < mapHeight - waterMargin; ++y) {
 					if( map[x,y] == 0) {
-						if( Random.value < CountNeigbors(x, y, 1)*0.25  ) {
+						if( Random.value < CountNeigbors(x, y, 1)*0.1f  ) {
 							newMap[x,y] = 1;
 						}
 					}
@@ -87,6 +89,18 @@ public class GridLoader : MonoBehaviour {
 				int type = map[x,y];
 				if(type > 0) {
 					Instantiate(tiles[type], new Vector3(x*tileSize,0,y*tileSize), Quaternion.identity);
+				}
+			}
+		}
+
+		//Place trees
+		for(int x = 0; x < map.GetLength(0); ++x) {
+			for(int y = 0; y < map.GetLength(1); ++y) {
+				int type = map[x,y];
+				if(type > 0 && Random.value > 0.8f) {
+
+					Transform tree = trees[Random.Range(0,trees.Length)];
+					Instantiate(tree, new Vector3(x*tileSize + Random.value - 0.5f,0,y*tileSize + Random.value - 0.5f), Quaternion.identity);
 				}
 			}
 		}

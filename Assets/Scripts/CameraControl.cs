@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 
 public class CameraControl : MonoBehaviour {
@@ -36,12 +36,14 @@ public class CameraControl : MonoBehaviour {
 	public float rainTime;
 
 	private GUIScript guiScript;
+	private SimulationScript simulationScript;
 
 	// Use this for initialization
 	void Start () {
 		gridLoader = GameObject.FindGameObjectWithTag("GameController").GetComponent<GridLoader>();
 		guiScript = GameObject.FindGameObjectWithTag("GameController").GetComponent<GUIScript>();
 		cameraComponent = this.GetComponent<Camera>();
+		simulationScript = GameObject.FindGameObjectWithTag("GameController").GetComponent<SimulationScript>();
 
 		//This determines how the mouse direction is mapped to movements in the 3d space
 		right = new Vector3(1,0,-1).normalized;
@@ -81,10 +83,13 @@ public class CameraControl : MonoBehaviour {
 			shakeTime -= Time.deltaTime;
 			transform.position = targetPos + displacement + Random.onUnitSphere*shakeTime*0.1f;
 			transform.LookAt(targetPos + Random.onUnitSphere*shakeTime*0.1f );
+
+			GetComponent<Vignetting>().chromaticAberration = shakeTime*5.0f;
 		}
 		else {
 			transform.position = targetPos + displacement;
 			transform.LookAt(targetPos);
+			GetComponent<Vignetting>().chromaticAberration = 0;
 		}
 
 		Vector2 move = new Vector3();
@@ -125,6 +130,7 @@ public class CameraControl : MonoBehaviour {
 
 			if(Input.GetMouseButtonUp(0) && !guiScript.mouseInUI() ) {
 				mode = "panning";
+				simulationScript.Meteor(selectionPosition, 1);
 			}
 		}
 		else {
