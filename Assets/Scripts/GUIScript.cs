@@ -14,14 +14,18 @@ public class GUIScript : MonoBehaviour {
 	public Transform manaText;
 	public Transform happinessText;
 
+	public Transform[] buildingCounts;
+
 
 	private SimulationScript simulationScript;
+	private AIBuilder aiBuilder;
 
 	public GUISkin guiSkin;
 
 	void Start() {
 
 		simulationScript = GetComponent<SimulationScript>();
+		aiBuilder = GetComponent<AIBuilder>();
 	
 	}
 
@@ -51,10 +55,18 @@ public class GUIScript : MonoBehaviour {
 		fireFrame.guiTexture.transform.position = new Vector3(GUIx(Screen.width/2 - 100 - 400 - 40),GUIy( 20 ),1);
 
 		//Update GUI Text
-		populationText.guiText.text = "Population: " + (int)simulationScript.population;
-		foodText.guiText.text = "Food: " + (int)simulationScript.food;
+		populationText.guiText.text = "Population: " + (int)simulationScript.population + "/" + (int)aiBuilder.getBuildingsByType("hut").Count*20;
+		foodText.guiText.text = "Food: " + (int)simulationScript.food + "/" + (int)(50 + aiBuilder.getBuildingsByType("granary").Count*50);
 		manaText.guiText.text = "Mana: " + (int)simulationScript.mana;
 		happinessText.guiText.text = "Suffering: " + (100 -(int)simulationScript.happiness) + "%";
+
+		//Update building counts
+		buildingCounts[0].guiText.text = "Huts: " + aiBuilder.getBuildingsByType("hut").Count;
+		buildingCounts[1].guiText.text = "Granaries: " + aiBuilder.getBuildingsByType("granary").Count;
+		buildingCounts[2].guiText.text = "Wells: " + aiBuilder.getBuildingsByType("well").Count;
+		buildingCounts[3].guiText.text = "Engineering Yards: " + aiBuilder.getBuildingsByType("engineering").Count;
+		buildingCounts[4].guiText.text = "Clinics: " + aiBuilder.getBuildingsByType("clinic").Count;
+		buildingCounts[5].guiText.text = "Walls: " + aiBuilder.getBuildingsByType("wall").Count;
 	}
 
 	void OnGUI() {

@@ -280,6 +280,6 @@ public class SimulationScript : MonoBehaviour {
 		}
 
 		//Clamp mana
-		mana = Mathf.Clamp(mana, 0, 10 + Mathf.Ceil( population / 50.0f ) );
+		mana = Mathf.Clamp(mana, 0, Mathf.Min( 10, (int)Mathf.Ceil( population / 50.0f ) ) );
 	}
 }
