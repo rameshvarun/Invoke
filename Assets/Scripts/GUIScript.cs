@@ -54,7 +54,7 @@ public class GUIScript : MonoBehaviour {
 		populationText.guiText.text = "Population: " + (int)simulationScript.population;
 		foodText.guiText.text = "Food: " + (int)simulationScript.food;
 		manaText.guiText.text = "Mana: " + (int)simulationScript.mana;
-		happinessText.guiText.text = "Happiness: " + (int)simulationScript.happiness;
+		happinessText.guiText.text = "Suffering: " + (100 -(int)simulationScript.happiness) + "%";
 	}
 
 	void OnGUI() {
@@ -64,7 +64,7 @@ public class GUIScript : MonoBehaviour {
 		GameObject[] guiObjects = GameObject.FindGameObjectsWithTag("GUI");
 		for(int i = 0; i < guiObjects.Length; ++i) {
 			if(guiObjects[i].GetComponent<ActionScript>().getRect().Contains(Input.mousePosition)) {
-				GUI.Box(new Rect (Input.mousePosition.x,Screen.height - Input.mousePosition.y,200,100), guiObjects[i].GetComponent<ActionScript>().tooltip);
+				GUI.Box(new Rect (Input.mousePosition.x,Screen.height - Input.mousePosition.y,300,200), guiObjects[i].GetComponent<ActionScript>().tooltip);
 			}
 		}
 	}

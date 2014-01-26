@@ -17,7 +17,10 @@ public class ParticleDisappearScript : MonoBehaviour {
 		destroyTime -= Time.deltaTime;
 
 		if(stopTime < 0) {
-			this.particleEmitter.emit = false;
+			if(particleEmitter)
+				particleEmitter.emit = false;
+			if(particleSystem)
+				particleSystem.Stop();
 		}
 		if(destroyTime < 0) {
 			Destroy(this.gameObject);

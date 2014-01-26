@@ -77,19 +77,34 @@ public class AIBuilder : MonoBehaviour {
 	}*/
 
 	void BuildWall() {
+		List<int> xpositions = new List<int>();
+		List<int> ypositions = new List<int>();
 		for(int x = 0; x < gridLoader.mapWidth; ++x) {
 			for(int y = 0; y < gridLoader.mapHeight; ++y) {
 				if(gridLoader.map[x,y] > 0 && getBuildingAt(x, y) == null) {
 					//Check if it borders water
 					if(gridLoader.map[x + 1,y] == 0 || gridLoader.map[x - 1,y] == 0 || gridLoader.map[x,y - 1] == 0 || gridLoader.map[x,y + 1] == 0) {
-						Vector3 position = new Vector3(x*gridLoader.tileSize,0,y*gridLoader.tileSize);
-						Transform gameObject = (Transform)Instantiate(wallTower, position, Quaternion.identity);
-						gameObject.GetComponent<BuildingScript>().x = x;
-						gameObject.GetComponent<BuildingScript>().y = y;
-						return;
+						xpositions.Add(x);
+						ypositions.Add(y);
+						//Vector3 position = ;
+						//positions.Add();
+						//
+						//
+						//
+						//return;
 					}
 				}
 			}
+		}
+
+		if(xpositions.Count > 0) {
+			int index = Random.Range(0, xpositions.Count);
+			int xPos = xpositions[index];
+			int yPos = ypositions[index];
+
+			Transform gameObject = (Transform)Instantiate(wallTower, new Vector3(xPos*gridLoader.tileSize,0,yPos*gridLoader.tileSize), Quaternion.identity);
+			gameObject.GetComponent<BuildingScript>().x = xPos;
+			gameObject.GetComponent<BuildingScript>().y = yPos;
 		}
 	}
 

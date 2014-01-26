@@ -34,6 +34,7 @@ public class CameraControl : MonoBehaviour {
 	public Transform rainSystem;
 
 	public float rainTime;
+	public float bloomTime;
 
 	private GUIScript guiScript;
 	private SimulationScript simulationScript;
@@ -79,6 +80,7 @@ public class CameraControl : MonoBehaviour {
 
 		cameraComponent.orthographicSize = Mathf.Lerp(cameraComponent.orthographicSize, targetScroll, scrollSpeed*Time.deltaTime);
 
+		//Camera shaking
 		if(shakeTime > 0) {
 			shakeTime -= Time.deltaTime;
 			transform.position = targetPos + displacement + Random.onUnitSphere*shakeTime*0.1f;
@@ -90,6 +92,15 @@ public class CameraControl : MonoBehaviour {
 			transform.position = targetPos + displacement;
 			transform.LookAt(targetPos);
 			GetComponent<Vignetting>().chromaticAberration = 0;
+		}
+
+		//Drought bloom
+		if(bloomTime > 0) {
+			bloomTime -= Time.deltaTime;
+			GetComponent<Bloom>().enabled = true;
+		}
+		else {
+			GetComponent<Bloom>().enabled = false;
 		}
 
 		Vector2 move = new Vector3();

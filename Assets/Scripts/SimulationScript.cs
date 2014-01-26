@@ -24,6 +24,8 @@ public class SimulationScript : MonoBehaviour {
 
 	public Transform wave;
 
+
+
 	// Use this for initialization
 	void Start () {
 		populationTimer = populationCycleTime;
@@ -37,6 +39,7 @@ public class SimulationScript : MonoBehaviour {
 		aiBuilder = GetComponent<AIBuilder>();
 		gridLoader = GetComponent<GridLoader>();
 		cameraControl = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraControl>();
+		defeat = false;
 	}
 
 	public void Water(int level) {
@@ -96,37 +99,55 @@ public class SimulationScript : MonoBehaviour {
 	}
 
 	public void Meteor(Vector3 position, int level) {
+		happiness -= 10.0f;
 		Instantiate(meteor, position, Quaternion.identity);
 	}
 
+	public Transform[] diseaseParticles;
 	public void Disease(int level) {
+		float effect = 0.0f;
 		if(level == 1) {
-			population -= population*0.1f;
+			effect = 0.1f;
 			happiness -= 20;
+			aiBuilder.affinities[AIBuilder.Action.Clinic] += 1;
 		}
 		if(level == 2) {
-			population -= population*0.15f;
+			effect = 0.15f;
 			happiness -= 50;
+			aiBuilder.affinities[AIBuilder.Action.Clinic] += 2;
 		}
 		if(level == 3) {
-			population -= population*0.20f;
+			effect = 0.20f;
 			happiness -= 100;
+			aiBuilder.affinities[AIBuilder.Action.Clinic] += 3;
+
 		}
+
+		effect -= 0.05f*aiBuilder.getBuildingsByType("clinic").Count;
+		if(effect > 0) {
+			population -= population*effect;
+
+		}
+		Instantiate(diseaseParticles[level - 1], new Vector3(50, 0, 50), Quaternion.identity);
 	}
 	
 	public void Fire(int level) {
 		if(level == 1) {
 			food -= 5;
 			happiness -= 10;
+			cameraControl.bloomTime = 5.0f;
 		}
 		if(level == 2) {
 			food -= 20;
 			happiness -= 25;
 			aiBuilder.affinities[AIBuilder.Action.WaterTower] += 2;
+			cameraControl.bloomTime = 5.0f;
 		}
 		if(level == 3) {
 			food -= 100;
 			happiness -= 100;
+
+			cameraControl.bloomTime = 5.0f;
 
 			int count = 30;
 			while(count > 0 ) {
@@ -182,30 +203,64 @@ public class SimulationScript : MonoBehaviour {
 			}
 		}
 	}
+
+	public Transform blackFade;
+	public Transform extinctionText;
+
+	private bool defeat;
+
+	private float defeatTime = 0.0f;
 	
 	// Update is called once per frame
 	void Update () {
+
+		GUIText InsufficientMana = GameObject.Find("InsufficientMana").guiText;
+		if(InsufficientMana.color.a < 0.5) {
+			InsufficientMana.color = Color.clear;
+		}
+		else {
+			InsufficientMana.color = Color.Lerp(InsufficientMana.color, Color.clear, 0.5f*Time.deltaTime);
+		}
+		if(defeat) {
+			blackFade.guiTexture.color = Color.Lerp(blackFade.guiTexture.color, Color.black, 1.0f*Time.deltaTime);
+			extinctionText.guiText.color = Color.Lerp(extinctionText.guiText.color, Color.white, 1.0f*Time.deltaTime);
+
+			defeatTime += Time.deltaTime;
+			if(defeatTime > 5.0f)
+				Application.LoadLevel(Application.loadedLevel);
+		}
+		else {
+			blackFade.guiTexture.color = Color.Lerp(blackFade.guiTexture.color, Color.clear, 1.0f*Time.deltaTime);
+		}
+
+		if(population <= 5) {
+			defeat = true;
+		}
+		
+		
 		populationTimer -= Time.deltaTime;
 		if(populationTimer < 0) {
 			//Reset population update timer
 			populationTimer = populationCycleTime;
 
 			//Chance that population formula will re-update
-			if(Random.value < populationCycleChance) {
+			//if(Random.value < populationCycleChance) {
 				population *= 1 +((food/population - 1)*0.5f);
 
 				//Population is limited to 20*number of huts
 				float populationMax = aiBuilder.getBuildingsByType("hut").Count*20;
 				if( population >  populationMax)
 					population = populationMax;
-			}
+
+
+			//}
 
 			//Food reduces by 5% of population
 			food -= population*0.05f;
 
 			//Chance of sacrifice
 			if(Random.value < (100.0f - happiness)/100.0f ) {
-				mana += 1.0f;
+				mana += 2.0f;
 			}
 		}
 		//Food cannot be less than zero, and is limited by the amount of granaries are owned
