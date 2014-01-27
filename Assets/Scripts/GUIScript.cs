@@ -67,6 +67,25 @@ public class GUIScript : MonoBehaviour {
 		buildingCounts[3].guiText.text = "Engineering Yards: " + aiBuilder.getBuildingsByType("engineering").Count;
 		buildingCounts[4].guiText.text = "Clinics: " + aiBuilder.getBuildingsByType("clinic").Count;
 		buildingCounts[5].guiText.text = "Walls: " + aiBuilder.getBuildingsByType("wall").Count;
+
+		//Disaster timer
+		GameObject disasterTimer = GameObject.Find("DisasterTimer");
+		if(simulationScript.getState() == 1) {
+			disasterTimer.guiText.enabled = true;
+			int minutes = ((int)simulationScript.getDisasterTime()/60);
+			int seconds = ((int)simulationScript.getDisasterTime() % 60);
+			string timer = minutes + ":";
+
+			if(seconds < 10)
+				timer += "0" + seconds;
+			else
+				timer += seconds;
+
+			disasterTimer.guiText.text = timer + " seconds until disaster";
+		}
+		else {
+			disasterTimer.guiText.enabled = false;
+		}
 	}
 
 	void OnGUI() {

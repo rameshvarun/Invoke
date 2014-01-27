@@ -42,6 +42,30 @@ public class AIBuilder : MonoBehaviour {
 		return null;
 	}
 
+	public void Shuffle<BuildingScript>(List<BuildingScript> list)  
+	{  
+
+		System.Random rng = new System.Random();  
+		int n = list.Count;  
+		while (n > 1) {  
+			n--;  
+			int k = rng.Next(n + 1);  
+			BuildingScript value = list[k];  
+			list[k] = list[n];  
+			list[n] = value;  
+		}  
+	}
+
+	public List<BuildingScript> randomBuildings() {
+		List<BuildingScript> list = new List<BuildingScript>();
+		GameObject[] buildings = GameObject.FindGameObjectsWithTag("Building");
+		for(int i = 0; i < buildings.Length; ++i) {
+			list.Add(buildings[i].GetComponent<BuildingScript>());
+		}
+		Shuffle(list);
+		return list;
+	}
+
 	public ArrayList getBuildingsByType(string buildingType) {
 		ArrayList buildingsList = new ArrayList();
 
@@ -109,10 +133,8 @@ public class AIBuilder : MonoBehaviour {
 	}
 
 	void Build(Transform building) {
-		GameObject[] buildings = GameObject.FindGameObjectsWithTag("Building");
 
-		while(true) {
-			BuildingScript randomBuilding = buildings[Random.Range(0, buildings.Length)].GetComponent<BuildingScript>();
+		foreach(BuildingScript randomBuilding in randomBuildings()) {
 			int randomX = Random.Range(-1,2) + randomBuilding.x;
 			int randomY = Random.Range(-1,2) + randomBuilding.y;
 

@@ -52,7 +52,7 @@ public class BuildingScript : MonoBehaviour {
 
 	public void DestroyBuilding() {
 		if(!destroying) {
-			targetPosition = transform.position - new Vector3(0,2,0);
+			targetPosition = transform.position - new Vector3(0,0.5f,0);
 			destroying = true;
 			Instantiate(destructionSmoke, transform.position + new Vector3(0,0,0), transform.rotation);
 			smokingTime = 1.0f;

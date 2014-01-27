@@ -87,20 +87,32 @@ public class CameraControl : MonoBehaviour {
 			transform.LookAt(targetPos + Random.onUnitSphere*shakeTime*0.1f );
 
 			GetComponent<Vignetting>().chromaticAberration = shakeTime*5.0f;
+
+			if(!quakeSound.audio.isPlaying)
+				quakeSound.audio.Play();
 		}
 		else {
 			transform.position = targetPos + displacement;
 			transform.LookAt(targetPos);
 			GetComponent<Vignetting>().chromaticAberration = 0;
+
+			if(quakeSound.audio.isPlaying)
+				quakeSound.audio.Stop();
 		}
 
 		//Drought bloom
 		if(bloomTime > 0) {
 			bloomTime -= Time.deltaTime;
 			GetComponent<Bloom>().enabled = true;
+
+			if(!sizzleSound.audio.isPlaying)
+				sizzleSound.audio.Play();
 		}
 		else {
 			GetComponent<Bloom>().enabled = false;
+
+			if(sizzleSound.audio.isPlaying)
+				sizzleSound.audio.Stop();
 		}
 
 		Vector2 move = new Vector3();
@@ -124,7 +136,7 @@ public class CameraControl : MonoBehaviour {
 		targetPos += targetScroll*upward*move.y*moveSpeed*Time.deltaTime;
 
 		targetPos.x = Mathf.Clamp(targetPos.x, 0, gridLoader.mapWidth*gridLoader.tileSize);
-		targetPos.y = Mathf.Clamp(targetPos.y, 0, gridLoader.mapHeight*gridLoader.tileSize);
+		targetPos.z = Mathf.Clamp(targetPos.z, 0, gridLoader.mapHeight*gridLoader.tileSize);
 
 		if(mode == "meteor") {
 			meteorSelect.renderer.enabled = true;
@@ -153,9 +165,19 @@ public class CameraControl : MonoBehaviour {
 		if(rainTime > 0.0f) {
 			rainTime -= Time.deltaTime;
 			rainSystem.particleSystem.Play();
+
+			if(!rainSound.audio.isPlaying)
+				rainSound.audio.Play();
 		}
 		else {
 			rainSystem.particleSystem.Stop();
+
+			if(rainSound.audio.isPlaying)
+				rainSound.audio.Stop();
 		}
 	}
+
+	public Transform rainSound;
+	public Transform quakeSound;
+	public Transform sizzleSound;
 }

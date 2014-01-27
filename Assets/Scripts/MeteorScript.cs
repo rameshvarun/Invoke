@@ -13,12 +13,16 @@ public class MeteorScript : MonoBehaviour {
 
 	public bool hit;
 
+	public AudioClip whoosh;
+	public AudioClip impact;
+
 	// Use this for initialization
 	void Start () {
 		targetPosition = transform.position;
 		transform.position += displacement;
 
 		cameraControl = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraControl>();
+		AudioSource.PlayClipAtPoint(whoosh, targetPosition);
 	}
 	
 	// Update is called once per frame
@@ -33,6 +37,7 @@ public class MeteorScript : MonoBehaviour {
 				hit = true;
 				transform.position = targetPosition;
 				cameraControl.shakeTime = 1.5f;
+				AudioSource.PlayClipAtPoint(impact, targetPosition);
 			}
 
 			GameObject[] buildings = GameObject.FindGameObjectsWithTag("Building");

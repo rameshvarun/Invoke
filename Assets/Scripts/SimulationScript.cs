@@ -25,6 +25,9 @@ public class SimulationScript : MonoBehaviour {
 	public Transform wave;
 
 
+	private int gameState = 0;
+	private float disasterTime = 0.0f;
+
 
 	// Use this for initialization
 	void Start () {
@@ -43,6 +46,7 @@ public class SimulationScript : MonoBehaviour {
 	}
 
 	public void Water(int level) {
+		int count = 0;
 		if(level == 1) {
 			cameraControl.rainTime = 5.0f;
 			food += 20;
@@ -53,48 +57,32 @@ public class SimulationScript : MonoBehaviour {
 			happiness -= 20;
 
 			//Target 2 random buildings
-			GameObject[] buildings = GameObject.FindGameObjectsWithTag("Building");
-			int count = 0;
-			while(count < Mathf.Min (2, buildings.Length)) {
-				GameObject randomBuilding = buildings[Random.Range(0, buildings.Length)];
-
-				if(randomBuilding.GetComponent<BuildingScript>().buildingType != "wall") {
-
-					Vector3 direction = new Vector3(Random.value - 0.5f, 0, Random.value - 0.5f);
-					direction.Normalize();
-
-					Vector3 wavePosition = randomBuilding.transform.position - direction*25.0f;
-
-					Transform gameObject = (Transform)Instantiate(wave, wavePosition, Quaternion.identity);
-					gameObject.GetComponent<WaveScript>().direction = direction;
-					++count;
-				}
-			}
+			count = 2;
 		}
 		if(level == 3) {
 
 			//Target 8 random buildings
-			GameObject[] buildings = GameObject.FindGameObjectsWithTag("Building");
-			int count = 0;
-			while(count < Mathf.Min (8, buildings.Length)) {
-				GameObject randomBuilding = buildings[Random.Range(0, buildings.Length)];
-				
-				if(randomBuilding.GetComponent<BuildingScript>().buildingType != "wall") {
-					
-					Vector3 direction = new Vector3(Random.value - 0.5f, 0, Random.value - 0.5f);
-					direction.Normalize();
-					
-					Vector3 wavePosition = randomBuilding.transform.position - direction*25.0f;
-					
-					Transform gameObject = (Transform)Instantiate(wave, wavePosition, Quaternion.identity);
-					gameObject.GetComponent<WaveScript>().direction = direction;
-					++count;
-				}
-			}
+			count = 8;
 
 			aiBuilder.affinities[AIBuilder.Action.Wall] += 10;
 			food += 500;
 			happiness -= 100;
+		}
+
+		if(count > 0) {
+			foreach(BuildingScript building in aiBuilder.randomBuildings()) {
+				if(building.buildingType != "wall") {
+					Vector3 direction = new Vector3(Random.value - 0.5f, 0, Random.value - 0.5f);
+					direction.Normalize();
+					Vector3 wavePosition = building.transform.position - direction*25.0f;
+					Transform gameObject = (Transform)Instantiate(wave, wavePosition, Quaternion.identity);
+					gameObject.GetComponent<WaveScript>().direction = direction;
+					--count;
+
+					if(count <= 0)
+						break;
+				}
+			}
 		}
 	}
 
@@ -195,11 +183,15 @@ public class SimulationScript : MonoBehaviour {
 		count -= aiBuilder.getBuildingsByType("engineering").Count;
 		count = Mathf.Clamp(count, 0, buildings.Length);
 
-		while(count > 0) {
-			BuildingScript randomBuilding = buildings[Random.Range(0, buildings.Length)].GetComponent<BuildingScript>();
-			if(!randomBuilding.isDestroyed()){
-				randomBuilding.DestroyBuilding();
-				--count;
+		if(count > 0) {
+
+			foreach(BuildingScript building in aiBuilder.randomBuildings()) {
+				if(!building.isDestroyed()) {
+					building.DestroyBuilding();
+					--count;
+					if(count <= 0)
+						break;
+				}
 			}
 		}
 	}
@@ -210,9 +202,59 @@ public class SimulationScript : MonoBehaviour {
 	private bool defeat;
 
 	private float defeatTime = 0.0f;
+	private int disasterNumber = 1;
+
+	public float getDisasterTime() {
+		return 100.0f - disasterTime;
+	}
+	public int getState() {
+		return gameState;
+	}
 	
 	// Update is called once per frame
 	void Update () {
+		if(gameState == 0) {
+			if(population > 100) {
+				gameState = 1;
+			}
+		}
+
+		if(gameState == 1) {
+			disasterTime += Time.deltaTime;
+
+			if(disasterTime > 100) {
+				disasterTime = 0;
+
+				if(disasterNumber == 1) {
+					Fire(3);
+				}
+				if(disasterNumber == 2) {
+					Fire(3);
+					Disease(3);
+				}
+				if(disasterNumber == 3) {
+					Fire(3);
+					Disease(3);
+					Water(3);
+				}
+				if(disasterNumber == 4) {
+					Fire(3);
+					Disease(3);
+					Water(3);
+					Quake(3);
+				}
+				if(disasterNumber > 4) {
+					for(int i = 0; i < disasterNumber - 4; ++i) {
+						Fire(3);
+						Disease(3);
+						Water(3);
+						Quake(3);
+					}
+				}
+
+				++disasterNumber;
+			}
+		}
 
 		GUIText InsufficientMana = GameObject.Find("InsufficientMana").guiText;
 		if(InsufficientMana.color.a < 0.5) {
@@ -280,6 +322,6 @@ public class SimulationScript : MonoBehaviour {
 		}
 
 		//Clamp mana
-		mana = Mathf.Clamp(mana, 0, Mathf.Min( 10, (int)Mathf.Ceil( population / 50.0f ) ) );
+		mana = Mathf.Clamp(mana, 0, Mathf.Min( 10, (int)Mathf.Ceil( population / 25.0f )*2 ) );
 	}
 }
