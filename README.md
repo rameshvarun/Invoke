@@ -1,7 +1,7 @@
 # God Complex
 God game created for Global Game Jam 2014.
 
-![Screenshot](http://i.imgur.com/dIMzLlk.jpg)
+![](./screenshot.jpg)
 
 ## Assets Used
 - Whoosh - http://www.freesound.org/people/Benboncan/sounds/167563/
